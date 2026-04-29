@@ -32,6 +32,9 @@ tar -zxvf squashfs4.3.tar.gz
 
 # Patch, build, and install the source
 cd squashfs4.3
-patch -p0 < ../patches/patch0.txt
+for patch_file in ../patches/patch*.txt
+do
+    patch -p0 < "$patch_file"
+done
 cd squashfs-tools
 make && $SUDO make install

@@ -1,0 +1,22 @@
+--- squashfs-tools/Makefile
++++ squashfs-tools/Makefile
+@@ -143,7 +143,8 @@
+ LZMA_OBJS = $(LZMA_DIR)/C/Alloc.o $(LZMA_DIR)/C/LzFind.o \
+ 	$(LZMA_DIR)/C/LzmaDec.o $(LZMA_DIR)/C/LzmaEnc.o $(LZMA_DIR)/C/LzmaLib.o
+ # CJH: Added LZMA variant directories
+-INCLUDEDIR += -I$(LZMA_DIR)/C -I$(LZMA_ALT_DIR) -I$(LZMA_ADAPT_DIR)
++LEGACY_LZMA_INCLUDES = -I$(LZMA_DIR)/C -I$(LZMA_ALT_DIR) -I$(LZMA_ADAPT_DIR)
++INCLUDEDIR += $(LEGACY_LZMA_INCLUDES)
+ CFLAGS += -DLZMA_SUPPORT
+ MKSQUASHFS_OBJS += lzma_wrapper.o $(LZMA_OBJS)
+ UNSQUASHFS_OBJS += lzma_wrapper.o $(LZMA_OBJS)
+@@ -287,6 +288,9 @@
+ 
+ lz4_wrapper.o: lz4_wrapper.c squashfs_fs.h lz4_wrapper.h compressor.h
+ 
++# xz_wrapper.c uses XZ Utils liblzma via <lzma.h>.
++# Do not let bundled legacy LZMA SDK headers shadow the system liblzma header.
++xz_wrapper.o: CFLAGS := $(filter-out $(LEGACY_LZMA_INCLUDES),$(CFLAGS))
+ xz_wrapper.o: xz_wrapper.c squashfs_fs.h xz_wrapper.h compressor.h
+ 
+ # CJH: Added LZMA_EXTRA_OBJS
